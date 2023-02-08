@@ -3,32 +3,27 @@ import numpy as np
 import matplotlib.pyplot as plt
 plt.rcParams['figure.figsize'] = [16,8]
 
-xC      = np.array([2,1])        #Center of data (mean)
-sig     = np.array([2, 0.5])     #Principal axes
 
-theta   = np.pi/3
+X = np.array([[1,1.1,0],[1,1.1,0],
+              [2,0.8,1],[2,0.8,1],
+              [1,0.9,0.1],[1,0.9,0.1]])
 
-R       = np.array([[np.cos(theta), -np.sin(theta)],    #Rotation Matrix
-                    [np.sin(theta), np.cos(theta)]])
-
-nPoints  = 10000                 # Create 10,000 points
-X       = R @ np.diag(sig) @ np.random.randn(2, nPoints) + np.diag(xC) @ np.ones((2, nPoints))
-
-
-
-fig = plt.figure()
-ax1 = fig.add_subplot(121)
-ax1.plot(X[0,:],X[1,:], '.', color='k')
-ax1.grid()
-plt.xlim((-6,8))
-plt.ylim((-6,8))
-
-
-Xavg = np.mean(X, axis=1)          #Compute mean
-B = X - np.tile(Xavg, (nPoints,1)).T    #Mean-Subtracted data
-
-#Find principal components (SVD)
-U, S, VT = np.linalg.svd(B/np.sqrt(nPoints), full_matrices=0)
+Y = np.array([[0.86, 0.81],[0.86,0.81],
+              [1.78,1.04],[1.78,1.04],
+              [0.83,0.71],[0.83,0.71]])
+nPoints = X.shape[0]
+Xavg = np.mean(X, axis=0)          #Compute mean
+B = X - np.tile(Xavg, (nPoints,1))   #Mean-Subtracted data
+B = X
+U, S, VT = np.linalg.svd(B)
+S = np.diag(S)
+#%%
+atrb = 2
+U1  = U[:,:atrb]
+VT1 = VT[:,:atrb]
+S1 = S[:atrb,:atrb]
+#a = Y   @ U1.T  @ np.linalg.inv(S1) @ VT1
+a = VT1 @ np.linalg.inv(S1) @ U1.T @ Y
 
 #%%
 ax2 = fig.add_subplot(122)
